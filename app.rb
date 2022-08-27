@@ -8,7 +8,7 @@ class WordGuesserApp < Sinatra::Base
   register Sinatra::Flash
   
   before do
-    @game = session[:game] || WordGuesserGame.new('')
+    @game = session[:game] || WordGuesserGame.new('Banana')
   end
   
   after do
@@ -21,6 +21,11 @@ class WordGuesserApp < Sinatra::Base
     redirect '/new'
   end
   
+
+  post '/new' do
+    redirect '/create'
+  end
+
   get '/new' do
     erb :new
   end
@@ -39,8 +44,15 @@ class WordGuesserApp < Sinatra::Base
   # If a guess is invalid, set flash[:message] to "Invalid guess."
   post '/guess' do
     letter = params[:guess].to_s[0]
-    ### YOUR CODE HERE ###
-    redirect '/show'
+    @game.guess(letter)
+    if @game.check_win_or_lose() == :win
+      redirect '/win'
+    elsif @game.check_win_or_lose() == :lose
+      redirect '/lose'
+    else
+      redirect '/show'
+    end
+    
   end
   
   # Everytime a guess is made, we should eventually end up at this route.
